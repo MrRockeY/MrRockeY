@@ -1,129 +1,126 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { usePathname } from 'next/navigation';
 
-const Navigation: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
+const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 10);
+      const scrollThreshold = 50;
+      setScrolled(window.scrollY > scrollThreshold);
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
 
     return () => {
-      document.body.style.overflow = 'auto';
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [isMobileMenuOpen]);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const navLinks = [
-    { title: 'Home', id: 'hero' },
-    { title: 'About', id: 'about' },
-    { title: 'Projects', id: 'projects' },
-    { title: 'Contact', id: 'contact' },
-  ];
+  }, []);
 
   return (
-    <header 
-      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'py-4 bg-background/80 backdrop-blur-xl shadow-sm dark:bg-background/70' : 'py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center justify-between">
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-background/80 backdrop-blur-lg shadow-sm' : 'bg-transparent'}`}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo/Brand */}
           <a 
             href="#hero" 
-            className="text-xl font-semibold tracking-tighter hover:text-primary transition-colors duration-300"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('hero');
-            }}
+            className="text-xl font-bold tracking-tighter transition-transform duration-200 hover:scale-105"
           >
-            Mr. RockeY
+            Mr.<span className="text-gradient">RockeY</span>
           </a>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <ul className="flex space-x-10">
-              {navLinks.map((link) => (
-                <li key={link.id}>
-                  <a
-                    href={`#${link.id}`}
-                    className="text-sm opacity-70 hover:opacity-100 hover:text-primary relative after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection(link.id);
-                    }}
-                  >
-                    {link.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a 
+              href="#about" 
+              className="text-sm font-medium transition-colors duration-200 hover:text-primary"
+            >
+              About
+            </a>
+            <a 
+              href="#projects" 
+              className="text-sm font-medium transition-colors duration-200 hover:text-primary"
+            >
+              Projects
+            </a>
+            <a 
+              href="#contact" 
+              className="text-sm font-medium transition-colors duration-200 hover:text-primary"
+            >
+              Contact
+            </a>
+            <a 
+              href="/order" 
+              className="text-sm font-medium transition-colors duration-200 hover:text-primary"
+            >
+              Order Services
+            </a>
+          </nav>
+          
+          <div className="flex items-center gap-4">
             <ThemeToggle />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex items-center space-x-4 md:hidden">
-            <ThemeToggle />
+            
+            {/* Mobile Menu Button */}
             <button
-              className="focus:outline-none transition-transform duration-200 hover:scale-110"
               onClick={toggleMobileMenu}
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="h-5 w-5 transition-transform duration-200 hover:scale-110" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="h-5 w-5 transition-transform duration-200 hover:scale-110" />
               )}
             </button>
           </div>
-        </nav>
+        </div>
       </div>
-
+      
       {/* Mobile Menu */}
-      <div
-        className={`fixed inset-0 bg-background dark:bg-background z-40 transform transition-transform duration-300 ease-out-expo ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } md:hidden`}
-      >
-        <div className="flex flex-col h-full justify-center items-center space-y-10 text-2xl font-medium">
-          {navLinks.map((link) => (
-            <a
-              key={link.id}
-              href={`#${link.id}`}
-              className="hover:text-primary transition-colors duration-300 hover:scale-110 transform"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(link.id);
-              }}
+      <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+        <div className="glass shadow-lg mx-4 my-2 p-4 rounded-lg">
+          <nav className="flex flex-col space-y-4">
+            <a 
+              href="#about" 
+              onClick={closeMobileMenu}
+              className="text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-md transition-colors duration-200"
             >
-              {link.title}
+              About
             </a>
-          ))}
+            <a 
+              href="#projects" 
+              onClick={closeMobileMenu}
+              className="text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-md transition-colors duration-200"
+            >
+              Projects
+            </a>
+            <a 
+              href="#contact" 
+              onClick={closeMobileMenu}
+              className="text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-md transition-colors duration-200"
+            >
+              Contact
+            </a>
+            <a 
+              href="/order" 
+              onClick={closeMobileMenu}
+              className="text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-md transition-colors duration-200"
+            >
+              Order Services
+            </a>
+          </nav>
         </div>
       </div>
     </header>
