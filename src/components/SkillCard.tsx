@@ -15,6 +15,7 @@ const SkillCard: React.FC<SkillCardProps> = ({
   delay = 0
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,11 +57,13 @@ const SkillCard: React.FC<SkillCardProps> = ({
         isVisible 
           ? 'opacity-100 translate-y-0' 
           : 'opacity-0 translate-y-8'
-      }`}
+      } ${isHovered ? 'transform -translate-y-2 shadow-lg dark:shadow-primary/10' : ''}`}
       style={{ transitionDelay: `${delay}ms` }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="mb-4 text-primary">{icon}</div>
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
+      <div className={`mb-4 text-primary transition-transform duration-300 ${isHovered ? 'scale-110' : ''}`}>{icon}</div>
+      <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${isHovered ? 'text-primary' : ''}`}>{title}</h3>
       <p className="text-foreground/60 text-sm">{description}</p>
     </div>
   );

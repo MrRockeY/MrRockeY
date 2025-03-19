@@ -34,14 +34,15 @@ const ThemeToggle = () => {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Sun className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-2 group">
+      <Sun className="h-4 w-4 text-muted-foreground group-hover:text-amber-400 transition-colors duration-200" />
       <Switch
         checked={isDarkMode}
         onCheckedChange={toggleTheme}
         aria-label="Toggle dark mode"
+        className="transition-transform duration-200 hover:scale-105"
       />
-      <Moon className="h-4 w-4 text-muted-foreground" />
+      <Moon className="h-4 w-4 text-muted-foreground group-hover:text-blue-400 transition-colors duration-200" />
     </div>
   );
 };

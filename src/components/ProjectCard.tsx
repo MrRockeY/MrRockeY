@@ -68,7 +68,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative h-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+      <div className="relative h-full bg-white dark:bg-black/40 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
         {/* Project Image */}
         <div className="relative overflow-hidden aspect-[16/9]">
           <div 
@@ -87,7 +87,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {/* Overlay content on hover */}
           <div 
             className={`absolute inset-0 flex flex-col justify-end p-6 transition-all duration-300 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
+              isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
             <div className="flex space-x-4 mb-4">
@@ -96,7 +96,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   href={liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-white bg-primary/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm hover:bg-primary transition-colors duration-200"
+                  className="flex items-center space-x-1 text-white bg-primary/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm hover:bg-primary transition-colors duration-200 hover:scale-105 transform"
                 >
                   <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                   <span>Live Demo</span>
@@ -108,7 +108,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   href={githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-white bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm hover:bg-black/80 transition-colors duration-200"
+                  className="flex items-center space-x-1 text-white bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm hover:bg-black/80 transition-colors duration-200 hover:scale-105 transform"
                 >
                   <Github className="w-3.5 h-3.5 mr-1.5" />
                   <span>GitHub</span>
@@ -120,12 +120,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         
         {/* Project Info */}
         <div className="p-6">
-          <h3 className="text-xl font-medium mb-2">{title}</h3>
+          <h3 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors duration-200">{title}</h3>
           <p className="text-foreground/60 text-sm mb-4">{description}</p>
           
           <div className="flex flex-wrap gap-2">
             {technologies.map((tech, i) => (
-              <span key={i} className="text-xs px-2 py-1 bg-secondary rounded-full">
+              <span 
+                key={i} 
+                className="text-xs px-2 py-1 bg-secondary rounded-full hover:bg-primary/20 hover:text-primary transition-colors duration-200"
+              >
                 {tech}
               </span>
             ))}

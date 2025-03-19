@@ -56,7 +56,7 @@ const Navigation: React.FC = () => {
         <nav className="flex items-center justify-between">
           <a 
             href="#hero" 
-            className="text-xl font-semibold tracking-tighter"
+            className="text-xl font-semibold tracking-tighter hover:text-primary transition-colors duration-300"
             onClick={(e) => {
               e.preventDefault();
               scrollToSection('hero');
@@ -72,7 +72,7 @@ const Navigation: React.FC = () => {
                 <li key={link.id}>
                   <a
                     href={`#${link.id}`}
-                    className="text-sm opacity-70 hover:opacity-100 transition-opacity duration-300"
+                    className="text-sm opacity-70 hover:opacity-100 hover:text-primary relative after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"
                     onClick={(e) => {
                       e.preventDefault();
                       scrollToSection(link.id);
@@ -90,7 +90,7 @@ const Navigation: React.FC = () => {
           <div className="flex items-center space-x-4 md:hidden">
             <ThemeToggle />
             <button
-              className="focus:outline-none"
+              className="focus:outline-none transition-transform duration-200 hover:scale-110"
               onClick={toggleMobileMenu}
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
@@ -115,7 +115,7 @@ const Navigation: React.FC = () => {
             <a
               key={link.id}
               href={`#${link.id}`}
-              className="hover:text-primary transition-colors duration-300"
+              className="hover:text-primary transition-colors duration-300 hover:scale-110 transform"
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection(link.id);

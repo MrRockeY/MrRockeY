@@ -25,6 +25,13 @@ const initializeTheme = () => {
 const App = () => {
   useEffect(() => {
     initializeTheme();
+    
+    // Add smooth scrolling behavior for the entire page
+    document.documentElement.style.scrollBehavior = "smooth";
+    
+    return () => {
+      document.documentElement.style.scrollBehavior = "auto";
+    };
   }, []);
 
   return (
@@ -33,10 +40,12 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="transition-colors duration-300 ease-in-out">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
