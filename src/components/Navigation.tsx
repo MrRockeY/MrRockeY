@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,7 +49,7 @@ const Navigation: React.FC = () => {
   return (
     <header 
       className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'py-4 bg-white/80 backdrop-blur-xl shadow-sm' : 'py-6'
+        isScrolled ? 'py-4 bg-background/80 backdrop-blur-xl shadow-sm dark:bg-background/70' : 'py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,41 +66,47 @@ const Navigation: React.FC = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <ul className="hidden md:flex space-x-10">
-            {navLinks.map((link) => (
-              <li key={link.id}>
-                <a
-                  href={`#${link.id}`}
-                  className="text-sm opacity-70 hover:opacity-100 transition-opacity duration-300"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection(link.id);
-                  }}
-                >
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="hidden md:flex items-center space-x-8">
+            <ul className="flex space-x-10">
+              {navLinks.map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={`#${link.id}`}
+                    className="text-sm opacity-70 hover:opacity-100 transition-opacity duration-300"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(link.id);
+                    }}
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <ThemeToggle />
+          </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden focus:outline-none"
-            onClick={toggleMobileMenu}
-            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          <div className="flex items-center space-x-4 md:hidden">
+            <ThemeToggle />
+            <button
+              className="focus:outline-none"
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </nav>
       </div>
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-out-expo ${
+        className={`fixed inset-0 bg-background dark:bg-background z-40 transform transition-transform duration-300 ease-out-expo ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         } md:hidden`}
       >
