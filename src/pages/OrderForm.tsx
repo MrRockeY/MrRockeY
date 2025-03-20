@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -60,6 +60,10 @@ const OrderForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [budgetValue, setBudgetValue] = useState(500);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  const formRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   
   // Initialize form
   const form = useForm<FormValues>({
@@ -76,6 +80,41 @@ const OrderForm = () => {
     },
   });
 
+  // Setup intersection observer for scroll reveal animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (formRef.current) {
+      observer.observe(formRef.current);
+    }
+
+    return () => {
+      if (formRef.current) {
+        observer.unobserve(formRef.current);
+      }
+    };
+  }, []);
+
+  // Effect for card entrance animation
+  useEffect(() => {
+    if (cardRef.current) {
+      setTimeout(() => {
+        cardRef.current?.classList.add('opacity-100', 'translate-y-0');
+        cardRef.current?.classList.remove('opacity-0', 'translate-y-8');
+      }, 100);
+    }
+  }, []);
+
   // Function to handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -86,6 +125,14 @@ const OrderForm = () => {
   // Function to disable past dates
   const disablePastDates = (date: Date) => {
     return date < new Date();
+  };
+
+  // Function to scroll to top of form on step change
+  const scrollToForm = () => {
+    window.scrollTo({
+      top: formRef.current?.offsetTop ? formRef.current.offsetTop - 100 : 0,
+      behavior: 'smooth',
+    });
   };
 
   // Handle form submission
@@ -135,11 +182,13 @@ const OrderForm = () => {
       }
     }
     setStep(step + 1);
+    scrollToForm();
   };
 
   // Function to go to previous step
   const prevStep = () => {
     setStep(step - 1);
+    scrollToForm();
   };
   
   // Track progress percentage
@@ -155,8 +204,8 @@ const OrderForm = () => {
               control={form.control}
               name="service"
               render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Select a Service</FormLabel>
+                <FormItem className="space-y-3 transition-all duration-500 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Select a Service</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger className="w-full">
@@ -184,8 +233,8 @@ const OrderForm = () => {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Your Name</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Your Name</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} className="transition-all duration-200 hover:border-primary focus:border-primary" />
                   </FormControl>
@@ -198,8 +247,8 @@ const OrderForm = () => {
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Email Address</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="youremail@example.com" {...field} className="transition-all duration-200 hover:border-primary focus:border-primary" />
                   </FormControl>
@@ -212,12 +261,12 @@ const OrderForm = () => {
               control={form.control}
               name="projectDetails"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Details</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Project Details</FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="Please describe your project requirements in detail..." 
-                      className="min-h-[120px] resize-y transition-all duration-200 hover:border-primary focus:border-primary"
+                      className="min-h-[120px] resize-y transition-all duration-200 hover:border-primary focus:border-primary dark:bg-background/80"
                       {...field} 
                     />
                   </FormControl>
@@ -226,14 +275,14 @@ const OrderForm = () => {
               )}
             />
             
-            <div className="space-y-2">
-              <FormLabel htmlFor="file" className="block">Reference Files (Optional)</FormLabel>
+            <div className="space-y-2 transition-all duration-300 hover:scale-[1.01]">
+              <FormLabel htmlFor="file" className="block text-base dark:text-white/90">Reference Files (Optional)</FormLabel>
               <div className="flex items-center gap-2 w-full">
                 <label 
                   htmlFor="file" 
-                  className="flex items-center justify-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer w-full hover:bg-secondary/50 transition-colors duration-200"
+                  className="flex items-center justify-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer w-full hover:bg-secondary/50 transition-colors duration-200 dark:hover:bg-white/5"
                 >
-                  <Upload size={18} />
+                  <Upload size={18} className="text-primary" />
                   <span>{selectedFile ? selectedFile.name : 'Upload Files'}</span>
                 </label>
                 <Input id="file" type="file" className="hidden" onChange={handleFileChange} />
@@ -248,8 +297,8 @@ const OrderForm = () => {
               control={form.control}
               name="budget"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Budget Range (USD)</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Budget Range (USD)</FormLabel>
                   <div className="space-y-4">
                     <Slider
                       defaultValue={[budgetValue]}
@@ -260,8 +309,9 @@ const OrderForm = () => {
                         setBudgetValue(vals[0]);
                         field.onChange(vals[0]);
                       }}
+                      className="py-4"
                     />
-                    <div className="text-center font-medium text-xl">${budgetValue}</div>
+                    <div className="text-center font-medium text-xl dark:text-gradient">${budgetValue}</div>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -272,8 +322,8 @@ const OrderForm = () => {
               control={form.control}
               name="deadline"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Project Deadline</FormLabel>
+                <FormItem className="flex flex-col transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Project Deadline</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -293,13 +343,14 @@ const OrderForm = () => {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange as (date: Date | undefined) => void}
+                        onSelect={field.onChange}
                         disabled={disablePastDates}
                         initialFocus
+                        className="p-3 pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
@@ -312,8 +363,8 @@ const OrderForm = () => {
               control={form.control}
               name="contactMethod"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Preferred Contact Method</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Preferred Contact Method</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select contact method" />
@@ -333,17 +384,18 @@ const OrderForm = () => {
               control={form.control}
               name="contactDetail"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Details</FormLabel>
+                <FormItem className="transition-all duration-300 hover:scale-[1.01]">
+                  <FormLabel className="text-base dark:text-white/90">Contact Details</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder={form.watch("contactMethod") === "email" 
                         ? "youremail@example.com" 
                         : "Your phone number"} 
                       {...field} 
+                      className="dark:bg-background/80"
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="dark:text-white/60">
                     {form.watch("contactMethod") === "whatsapp" && "Please include country code"}
                   </FormDescription>
                   <FormMessage />
@@ -361,29 +413,32 @@ const OrderForm = () => {
     <div className="min-h-screen flex flex-col relative bg-gradient-to-b from-background to-background/80">
       <Navigation />
       
-      <div className="mt-28 mb-16 flex-grow">
+      <div className="mt-28 mb-16 flex-grow" ref={formRef}>
         <div className="container px-4 mx-auto max-w-4xl">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Order Services</h1>
-            <p className="mt-3 text-muted-foreground">Fill out the form below to request any service you need</p>
+          <div className={`text-center mb-10 transition-all duration-700 ease-out-expo ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl dark:text-white/95 dark-text-shadow">Order Services</h1>
+            <p className="mt-3 text-muted-foreground dark:text-white/70">Fill out the form below to request any service you need</p>
           </div>
           
           {/* Progress Bar */}
-          <div className="w-full bg-secondary/50 h-1 rounded-full mb-8">
+          <div className={`w-full bg-secondary/50 h-1 rounded-full mb-8 overflow-hidden transition-all duration-700 ease-out-expo ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '100ms' }}>
             <div
-              className="bg-primary h-1 rounded-full transition-all duration-300 ease-out-expo"
+              className="bg-primary h-1 rounded-full transition-all duration-500 ease-out-expo"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
           
-          <Card className="glass backdrop-blur-sm border-opacity-40 shadow-xl">
+          <Card 
+            className="glass backdrop-blur-sm border-opacity-40 shadow-xl opacity-0 translate-y-8 transition-all duration-700 ease-out-expo dark:bg-black/40 dark:border-white/10"
+            ref={cardRef}
+          >
             <CardHeader>
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl dark:text-white/95 dark-text-shadow">
                 {step === 1 && "Select Service"}
                 {step === 2 && "Project Information"}
                 {step === 3 && "Budget & Timeline"}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="dark:text-white/70">
                 {step === 1 && "Choose the service you need"}
                 {step === 2 && "Tell us about your project"}
                 {step === 3 && "Set your budget and timeline"}
@@ -404,7 +459,7 @@ const OrderForm = () => {
                   type="button" 
                   variant="outline" 
                   onClick={prevStep}
-                  className="transition-all duration-200 hover:bg-secondary"
+                  className="transition-all duration-300 hover:scale-105 hover:bg-secondary dark:hover:bg-white/5 dark:text-white/80 dark:border-white/20"
                 >
                   Previous
                 </Button>
@@ -416,7 +471,7 @@ const OrderForm = () => {
                 <Button 
                   type="button" 
                   onClick={nextStep}
-                  className="transition-all duration-200 hover:bg-primary/90"
+                  className="transition-all duration-300 hover:scale-105 hover:bg-primary/90 dark:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                 >
                   Next
                 </Button>
@@ -424,7 +479,7 @@ const OrderForm = () => {
                 <Button 
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={isSubmitting}
-                  className="transition-all duration-300 hover:bg-primary/90 group"
+                  className="transition-all duration-300 hover:scale-105 hover:bg-primary/90 group dark:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
