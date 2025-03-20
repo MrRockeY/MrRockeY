@@ -29,8 +29,7 @@ const initializeTheme = () => {
 
 // Get the base URL from the environment or use a default
 const getBaseUrl = () => {
-  // This ensures we use the correct base URL in production (GitHub Pages) and development
-  return import.meta.env.BASE_URL || '/';
+  return "/mrrockey/"; // Hardcode for GitHub Pages deployment
 };
 
 const App = () => {

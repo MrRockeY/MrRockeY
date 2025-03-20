@@ -13,9 +13,6 @@ const NotFound = () => {
     );
   }, [location.pathname]);
 
-  // Get base URL from environment
-  const baseUrl = import.meta.env.BASE_URL || '/';
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative">
       {/* Background elements */}
