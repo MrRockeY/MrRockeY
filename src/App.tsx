@@ -27,6 +27,12 @@ const initializeTheme = () => {
   }
 };
 
+// Get the base URL from the environment or use a default
+const getBaseUrl = () => {
+  // This ensures we use the correct base URL in production (GitHub Pages) and development
+  return import.meta.env.BASE_URL || '/';
+};
+
 const App = () => {
   useEffect(() => {
     initializeTheme();
@@ -75,12 +81,14 @@ const App = () => {
     };
   }, []);
 
+  const baseUrl = getBaseUrl();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename={baseUrl}>
           <AnimatePresence mode="wait">
             <div className="transition-colors duration-300 ease-in-out">
               <Suspense fallback={<LoadingSpinner />}>

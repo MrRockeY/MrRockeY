@@ -1,5 +1,5 @@
 
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 
@@ -12,6 +12,9 @@ const NotFound = () => {
       location.pathname
     );
   }, [location.pathname]);
+
+  // Get base URL from environment
+  const baseUrl = import.meta.env.BASE_URL || '/';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative">
@@ -27,13 +30,13 @@ const NotFound = () => {
         <p className="text-foreground/60 max-w-md mx-auto mb-10">
           The page you are looking for might have been removed, renamed, or is temporarily unavailable.
         </p>
-        <a 
-          href="/" 
+        <Link 
+          to="/" 
           className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />
           <span>Return to Home</span>
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -54,11 +54,17 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Get base URL from environment
+  const baseUrl = import.meta.env.BASE_URL || '/';
+
+  // Check if we're on the index page
+  const isHomePage = location.pathname === '/' || location.pathname === baseUrl;
+
   const navItems = [
     { href: "#about", label: "About", icon: <User className="w-4 h-4" /> },
     { href: "#projects", label: "Projects", icon: <Code className="w-4 h-4" /> },
     { href: "#contact", label: "Contact", icon: <Mail className="w-4 h-4" /> },
-    { href: "/order", label: "Order Services", icon: <ChevronRight className="w-4 h-4" /> }
+    { href: `${isHomePage ? '' : baseUrl}order`, label: "Order Services", icon: <ChevronRight className="w-4 h-4" /> }
   ];
 
   const isActive = (href: string) => {
@@ -114,6 +120,9 @@ const Navigation = () => {
     open: { opacity: 1, x: 0 }
   };
 
+  // Home link for the order page to go back to main site
+  const homeLink = baseUrl || '/';
+
   return (
     <motion.header 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -126,41 +135,71 @@ const Navigation = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
-          <motion.a 
-            href="#hero" 
-            className="text-xl font-bold tracking-tighter dark:text-white/95 relative group"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Mr.<span className="text-gradient">RockeY</span>
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary dark:bg-primary/80 transition-all duration-300 group-hover:w-full origin-left"></span>
-          </motion.a>
+          {isHomePage ? (
+            <motion.a 
+              href="#hero" 
+              className="text-xl font-bold tracking-tighter dark:text-white/95 relative group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Mr.<span className="text-gradient">RockeY</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary dark:bg-primary/80 transition-all duration-300 group-hover:w-full origin-left"></span>
+            </motion.a>
+          ) : (
+            <Link 
+              to={homeLink}
+              className="text-xl font-bold tracking-tighter dark:text-white/95 relative group flex items-center"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                <span>Mr.<span className="text-gradient">RockeY</span></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary dark:bg-primary/80 transition-all duration-300 group-hover:w-full origin-left"></span>
+              </motion.div>
+            </Link>
+          )}
           
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map((item, index) => (
-              <motion.a 
-                key={item.href}
-                href={item.href} 
-                className={`text-sm font-medium transition-colors duration-200 hover:text-primary dark:hover:text-primary/90 relative group ${
-                  isActive(item.href) 
-                    ? 'text-primary dark:text-primary/90 font-semibold' 
-                    : 'text-foreground/80 dark:text-white/80'
-                }`}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index, duration: 0.5 }}
+            {isHomePage ? (
+              // Show regular navigation on home page
+              navItems.map((item, index) => (
+                <motion.a 
+                  key={item.href}
+                  href={item.href.startsWith('#') ? item.href : item.href} 
+                  className={`text-sm font-medium transition-colors duration-200 hover:text-primary dark:hover:text-primary/90 relative group ${
+                    isActive(item.href) 
+                      ? 'text-primary dark:text-primary/90 font-semibold' 
+                      : 'text-foreground/80 dark:text-white/80'
+                  }`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index, duration: 0.5 }}
+                >
+                  <AnimatedTooltip content={item.label} delay={0.3}>
+                    <span className="flex items-center">
+                      {item.label}
+                      <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary dark:bg-primary/80 transition-all duration-300 ${
+                        isActive(item.href) ? 'w-full' : 'w-0 group-hover:w-full'
+                      } origin-left`}></span>
+                    </span>
+                  </AnimatedTooltip>
+                </motion.a>
+              ))
+            ) : (
+              // Show only home link on other pages
+              <Link 
+                to={homeLink}
+                className="text-sm font-medium transition-colors duration-200 hover:text-primary dark:hover:text-primary/90 relative group"
               >
-                <AnimatedTooltip content={item.label} delay={0.3}>
-                  <span className="flex items-center">
-                    {item.label}
-                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary dark:bg-primary/80 transition-all duration-300 ${
-                      isActive(item.href) ? 'w-full' : 'w-0 group-hover:w-full'
-                    } origin-left`}></span>
-                  </span>
-                </AnimatedTooltip>
-              </motion.a>
-            ))}
+                <span className="flex items-center">
+                  <Home className="w-4 h-4 mr-1" /> Back to Home
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-primary dark:bg-primary/80 transition-all duration-300 group-hover:w-full origin-left"></span>
+                </span>
+              </Link>
+            )}
           </nav>
           
           <div className="flex items-center gap-4">
@@ -225,34 +264,47 @@ const Navigation = () => {
               transition={{ duration: 0.3 }}
             >
               <nav className="flex flex-col space-y-3">
-                <motion.a 
-                  href="#hero" 
-                  onClick={closeMobileMenu}
-                  className="flex items-center space-x-3 text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-lg transition-colors duration-200 dark:text-white/80 dark:hover:bg-primary/20"
-                  variants={mobileItemVariants}
-                  whileHover={{ x: 5 }}
-                >
-                  <Home className="w-4 h-4 text-primary/80" />
-                  <span>Home</span>
-                </motion.a>
-                
-                {navItems.map((item, index) => (
-                  <motion.a 
-                    key={item.href}
-                    href={item.href} 
+                {isHomePage ? (
+                  <>
+                    <motion.a 
+                      href="#hero" 
+                      onClick={closeMobileMenu}
+                      className="flex items-center space-x-3 text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-lg transition-colors duration-200 dark:text-white/80 dark:hover:bg-primary/20"
+                      variants={mobileItemVariants}
+                      whileHover={{ x: 5 }}
+                    >
+                      <Home className="w-4 h-4 text-primary/80" />
+                      <span>Home</span>
+                    </motion.a>
+                    
+                    {navItems.map((item, index) => (
+                      <motion.a 
+                        key={item.href}
+                        href={item.href} 
+                        onClick={closeMobileMenu}
+                        className={`flex items-center space-x-3 text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-lg transition-colors duration-200 dark:hover:bg-primary/20 ${
+                          isActive(item.href) 
+                            ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/90' 
+                            : 'dark:text-white/80'
+                        }`}
+                        variants={mobileItemVariants}
+                        whileHover={{ x: 5 }}
+                      >
+                        <span className="text-primary/80">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </motion.a>
+                    ))}
+                  </>
+                ) : (
+                  <Link 
+                    to={homeLink}
                     onClick={closeMobileMenu}
-                    className={`flex items-center space-x-3 text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-lg transition-colors duration-200 dark:hover:bg-primary/20 ${
-                      isActive(item.href) 
-                        ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/90' 
-                        : 'dark:text-white/80'
-                    }`}
-                    variants={mobileItemVariants}
-                    whileHover={{ x: 5 }}
+                    className="flex items-center space-x-3 text-sm font-medium py-2 px-4 hover:bg-primary/10 rounded-lg transition-colors duration-200 dark:text-white/80 dark:hover:bg-primary/20"
                   >
-                    <span className="text-primary/80">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </motion.a>
-                ))}
+                    <Home className="w-4 h-4 text-primary/80" />
+                    <span>Back to Home</span>
+                  </Link>
+                )}
               </nav>
             </motion.div>
           </motion.div>
