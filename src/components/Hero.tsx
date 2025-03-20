@@ -2,30 +2,29 @@
 import React, { useEffect, useState, useRef } from 'react';
 import AnimatedText from './AnimatedText';
 import ScrollDown from './ui/ScrollDown';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import HeroBackground from './HeroBackground';
+import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
   const [showContent, setShowContent] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
     // Delay animation to ensure it plays after initial page load
     const timer = setTimeout(() => {
       setShowContent(true);
     }, 100);
-
-    // Add a scroll event for parallax effect
-    const handleScroll = () => {
-      if (heroRef.current) {
-        const scrollTop = window.scrollY;
-        const opacity = Math.max(0, 1 - scrollTop / 700); // Fade out as user scrolls
-        const transform = `translateY(${scrollTop * 0.3}px)`; // Parallax effect
-        
-        heroRef.current.style.opacity = opacity.toString();
-        heroRef.current.querySelector('.section-container')!.setAttribute('style', `transform: ${transform}`);
-      }
-    };
 
     // Add a mousemove event for subtle mouse tracking effect
     const handleMouseMove = (e: MouseEvent) => {
@@ -35,12 +34,10 @@ const Hero: React.FC = () => {
       });
     };
 
-    window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
@@ -55,19 +52,26 @@ const Hero: React.FC = () => {
       className="relative min-h-screen flex items-center pt-20 overflow-hidden"
       ref={heroRef}
     >
+      {/* Interactive background */}
+      <HeroBackground />
+      
       {/* Background effects with parallax */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
+      <div className="absolute inset-0 overflow-hidden -z-10">
+        <motion.div 
           className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary/5 blur-3xl dark:bg-primary/10 transition-transform duration-500" 
           style={{ transform: calculateTransform(-20) }} 
         />
-        <div 
+        <motion.div 
           className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-400/5 blur-3xl dark:bg-blue-400/10 transition-transform duration-500"
           style={{ transform: calculateTransform(-15) }}
         />
       </div>
       
-      <div className="section-container flex flex-col justify-center transition-transform duration-500 ease-out z-10">
+      <motion.div 
+        className="section-container flex flex-col justify-center z-10"
+        ref={containerRef}
+        style={{ y, opacity }}
+      >
         <div className="max-w-4xl">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -111,31 +115,45 @@ const Hero: React.FC = () => {
             </motion.p>
             
             <div className="flex flex-wrap gap-4">
-              <motion.a 
-                href="#projects" 
-                className="btn-primary dark-glow group relative overflow-hidden"
+              <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
+                className="relative"
               >
-                <span className="relative z-10">View My Work</span>
-                <span className="absolute inset-0 bg-primary/20 transform translate-y-full transition-transform group-hover:translate-y-0 duration-300 ease-out-expo" />
-              </motion.a>
+                <Link 
+                  to="#projects" 
+                  className="btn-primary dark-glow group relative overflow-hidden"
+                >
+                  <span className="relative z-10">View My Work</span>
+                  <span className="absolute inset-0 bg-primary/20 transform translate-y-full transition-transform group-hover:translate-y-0 duration-300 ease-out-expo" />
+                  <motion.span 
+                    className="absolute -inset-1 rounded-lg opacity-70 blur-sm bg-gradient-to-r from-primary/60 to-blue-500/60 dark:from-primary/80 dark:to-blue-500/80"
+                    animate={{ 
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                    }}
+                  />
+                </Link>
+              </motion.div>
               
-              <motion.a 
-                href="/order" 
-                className="btn-secondary group relative overflow-hidden"
+              <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
               >
-                <span className="relative z-10">Order Services</span>
-                <span className="absolute inset-0 bg-secondary/30 transform translate-y-full transition-transform group-hover:translate-y-0 duration-300 ease-out-expo" />
-              </motion.a>
+                <Link 
+                  to="/order" 
+                  className="btn-secondary group relative overflow-hidden"
+                >
+                  <span className="relative z-10">Order Services</span>
+                  <span className="absolute inset-0 bg-secondary/30 transform translate-y-full transition-transform group-hover:translate-y-0 duration-300 ease-out-expo" />
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -148,7 +166,42 @@ const Hero: React.FC = () => {
         >
           <ScrollDown targetId="about" />
         </motion.div>
-      </div>
+        
+        {/* Floating 3D elements */}
+        <motion.div
+          className="absolute right-[10%] top-1/3 w-20 h-20 md:w-32 md:h-32 hidden md:block"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+          style={{ 
+            transform: calculateTransform(10),
+            rotateX: Math.sin(mousePosition.y * Math.PI) * 20, 
+            rotateY: -Math.sin(mousePosition.x * Math.PI) * 20 
+          }}
+        >
+          <div className="relative w-full h-full preserve-3d animate-float">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-blue-400/40 dark:from-primary/60 dark:to-blue-400/60 rounded-xl"></div>
+            <div className="absolute inset-0 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-xl shadow-xl"></div>
+          </div>
+        </motion.div>
+        
+        <motion.div
+          className="absolute left-[15%] bottom-1/3 w-16 h-16 md:w-24 md:h-24 hidden md:block"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 1.7 }}
+          style={{ 
+            transform: calculateTransform(-15),
+            rotateX: Math.sin(mousePosition.y * Math.PI) * 20, 
+            rotateY: -Math.sin(mousePosition.x * Math.PI) * 20 
+          }}
+        >
+          <div className="relative w-full h-full preserve-3d animate-float" style={{ animationDelay: '-2s' }}>
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/40 to-purple-500/40 dark:from-blue-400/60 dark:to-purple-500/60 rounded-full"></div>
+            <div className="absolute inset-0 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-full shadow-xl"></div>
+          </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

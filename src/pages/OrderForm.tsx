@@ -33,12 +33,13 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CheckCircle, CalendarIcon, Upload, AlertCircle } from 'lucide-react';
+import { CheckCircle, CalendarIcon, Upload, AlertCircle, Home, ArrowLeft } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import Navigation from '@/components/Navigation';
+import { Link } from 'react-router-dom';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -411,7 +412,49 @@ const OrderForm = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative bg-gradient-to-b from-background to-background/80">
-      <Navigation />
+      <div className="fixed top-0 w-full z-50 transition-all duration-300 bg-background/80 backdrop-blur-lg shadow-sm dark:bg-black/50 dark:shadow-md dark:shadow-black/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            {/* Logo/Brand */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link to="/" className="text-xl font-bold tracking-tighter dark:text-white/95 relative group flex items-center">
+                <ArrowLeft className="mr-2 h-5 w-5 text-primary dark:text-primary/90" />
+                Back to Home
+              </Link>
+            </motion.div>
+            
+            {/* Logo/Brand centered */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold tracking-tighter dark:text-white/95"
+            >
+              Mr.<span className="text-gradient">RockeY</span>
+            </motion.div>
+            
+            {/* Right side actions */}
+            <div className="flex items-center">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Link 
+                  to="/#contact" 
+                  className="btn-secondary text-sm px-4 py-2 rounded-lg hover:bg-secondary/80"
+                >
+                  Need Help?
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="mt-28 mb-16 flex-grow" ref={formRef}>
         <div className="container px-4 mx-auto max-w-4xl">
@@ -498,6 +541,34 @@ const OrderForm = () => {
               )}
             </CardFooter>
           </Card>
+
+          {/* Pricing Estimation */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            viewport={{ once: true }}
+            className="mt-12 text-center"
+          >
+            <h2 className="text-2xl font-semibold mb-6 dark:text-white/90">Service Pricing Guide</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="rounded-xl p-6 bg-white/30 dark:bg-black/30 border border-border dark:border-white/10 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300">
+                <h3 className="text-lg font-medium mb-2 dark:text-white/85">Web Development</h3>
+                <p className="text-foreground/60 dark:text-white/60 mb-4">Custom websites with modern UI/UX</p>
+                <p className="text-xl font-semibold text-primary">From $499</p>
+              </div>
+              <div className="rounded-xl p-6 bg-white/30 dark:bg-black/30 border border-border dark:border-white/10 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300">
+                <h3 className="text-lg font-medium mb-2 dark:text-white/85">Graphic Design</h3>
+                <p className="text-foreground/60 dark:text-white/60 mb-4">Logos, posters, and marketing materials</p>
+                <p className="text-xl font-semibold text-primary">From $199</p>
+              </div>
+              <div className="rounded-xl p-6 bg-white/30 dark:bg-black/30 border border-border dark:border-white/10 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300">
+                <h3 className="text-lg font-medium mb-2 dark:text-white/85">SEO Optimization</h3>
+                <p className="text-foreground/60 dark:text-white/60 mb-4">Improve visibility and search rankings</p>
+                <p className="text-xl font-semibold text-primary">From $299</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
       
