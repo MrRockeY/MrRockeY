@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ProjectCard from './ProjectCard';
 import AnimatedText from './AnimatedText';
+import { motion } from 'framer-motion';
 
 const Projects: React.FC = () => {
   const [filter, setFilter] = useState('all');
@@ -84,54 +85,115 @@ const Projects: React.FC = () => {
     { id: 'game', label: 'Games' },
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
   return (
-    <section id="projects" ref={sectionRef} className="py-20 md:py-32 bg-secondary/30">
-      <div className="section-container">
-        <div className="text-center mb-16">
-          <div className="inline-block rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary mb-6">
+    <section 
+      id="projects" 
+      ref={sectionRef} 
+      className="py-20 md:py-32 bg-secondary/30 dark:bg-gray-900/50 relative overflow-hidden"
+    >
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-3xl dark:bg-primary/5" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-blue-400/5 blur-3xl dark:bg-blue-400/5" />
+      </div>
+      
+      <div className="section-container relative z-10">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div 
+            className="inline-block rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             My Projects
-          </div>
+          </motion.div>
           
           <AnimatedText 
             text="Selected work I've crafted" 
             className="text-3xl md:text-4xl font-semibold mb-6 mx-auto"
             once
-            delay={isVisible ? 0 : 0}
+            type="words"
+            highlight
+            delay={isVisible ? 300 : 0}
           />
           
-          <p className={`text-foreground/60 max-w-2xl mx-auto transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}>
+          <motion.p 
+            className="text-foreground/60 dark:text-white/60 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
             Browse through my recent projects showcasing my expertise in web development, SEO optimization, and interactive experiences.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
         
         {/* Project Filters */}
-        <div className={`flex justify-center mb-12 transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`} style={{ transitionDelay: '200ms' }}>
-          <div className="inline-flex bg-white rounded-full p-1 shadow-sm">
-            {categories.map(category => (
-              <button
+        <motion.div 
+          className="flex justify-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <div className="inline-flex bg-white dark:bg-gray-800/90 rounded-full p-1 shadow-sm">
+            {categories.map((category, i) => (
+              <motion.button
                 key={category.id}
                 onClick={() => setFilter(category.id)}
-                className={`px-4 py-2 text-sm rounded-full transition-all duration-200 ${
+                className={`px-4 py-2 text-sm rounded-full transition-all duration-300 relative ${
                   filter === category.id 
-                    ? 'bg-primary text-white shadow-sm' 
-                    : 'hover:bg-secondary'
+                    ? 'text-white z-10' 
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white/80'
                 }`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * i + 0.6 }}
+                whileHover={{ scale: filter === category.id ? 1 : 1.05 }}
+                whileTap={{ scale: 0.98 }}
               >
+                {filter === category.id && (
+                  <motion.span 
+                    className="absolute inset-0 bg-primary rounded-full -z-10"
+                    layoutId="filterBackground"
+                    transition={{ type: "spring", duration: 0.6, bounce: 0.3 }}
+                  />
+                )}
                 {category.label}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
         
         {/* Project Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           {filteredProjects.map((project, index) => (
             <ProjectCard
-              key={index}
+              key={project.title}
               index={index}
               title={project.title}
               description={project.description}
@@ -141,7 +203,7 @@ const Projects: React.FC = () => {
               githubUrl={project.githubUrl}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

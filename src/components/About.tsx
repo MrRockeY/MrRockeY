@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Code, Globe, Cpu, Lightbulb } from 'lucide-react';
 import SkillCard from './SkillCard';
 import AnimatedText from './AnimatedText';
+import { motion } from 'framer-motion';
 
 const About: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -57,6 +58,29 @@ const About: React.FC = () => {
     },
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
   return (
     <section 
       id="about" 
@@ -64,14 +88,18 @@ const About: React.FC = () => {
       className="relative py-20 md:py-32"
     >
       {/* Background pattern */}
-      <div className="absolute inset-0 bg-noise opacity-50" />
+      <div className="absolute inset-0 bg-noise opacity-50 dark:opacity-20" />
       
       <div className="section-container">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <div>
-            <div className="inline-block rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary mb-6">
+          <motion.div
+            initial="hidden"
+            animate={isVisible ? "show" : "hidden"}
+            variants={container}
+          >
+            <motion.div variants={item} className="inline-block rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary mb-6">
               About Me
-            </div>
+            </motion.div>
             
             <AnimatedText 
               text="I create websites that people love to use" 
@@ -80,26 +108,43 @@ const About: React.FC = () => {
               delay={isVisible ? 0 : 0}
             />
             
-            <div className={`space-y-4 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <p className="text-foreground/70">
+            <div className="space-y-4">
+              <motion.p 
+                variants={item} 
+                className="text-foreground/70 dark:text-white/70"
+              >
                 I'm Mr. RockeY, a passionate full-stack web developer with expertise in modern web technologies. I combine technical skills with creative problem-solving to build digital products that stand out.
-              </p>
-              <p className="text-foreground/70">
+              </motion.p>
+              <motion.p 
+                variants={item} 
+                className="text-foreground/70 dark:text-white/70"
+              >
                 With a focus on performance optimization and user experience, I create websites that not only look beautiful but also convert visitors into customers.
-              </p>
+              </motion.p>
               
-              <div className="pt-4">
-                <h3 className="text-lg font-medium mb-3">Technical Expertise</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <motion.div variants={item} className="pt-4">
+                <h3 className="text-lg font-medium mb-3 dark:text-white/90">Technical Expertise</h3>
+                <motion.div 
+                  className="grid grid-cols-2 md:grid-cols-4 gap-2"
+                  variants={container}
+                  initial="hidden"
+                  animate={isVisible ? "show" : "hidden"}
+                >
                   {['HTML5', 'CSS3', 'JavaScript', 'React', 'Node.js', 'SEO', 'UI/UX', 'API Design'].map((skill, index) => (
-                    <span key={index} className="bg-secondary text-secondary-foreground px-3 py-1.5 rounded-full text-sm inline-block text-center">
+                    <motion.span 
+                      key={index} 
+                      className="bg-secondary text-secondary-foreground px-3 py-1.5 rounded-full text-sm inline-block text-center hover:bg-primary hover:text-white transition-colors duration-300"
+                      variants={item}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       {skill}
-                    </span>
+                    </motion.span>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {skills.map((skill, index) => (

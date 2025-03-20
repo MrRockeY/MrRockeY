@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import OrderForm from "./pages/OrderForm";
 import NotFound from "./pages/NotFound";
@@ -41,13 +42,15 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="transition-colors duration-300 ease-in-out">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/order" element={<OrderForm />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+          <AnimatePresence mode="wait">
+            <div className="transition-colors duration-300 ease-in-out">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/order" element={<OrderForm />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </AnimatePresence>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
